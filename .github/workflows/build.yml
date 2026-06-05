@@ -1,0 +1,35 @@
+name: Build OpenOCPP ESP32-S3
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # ESP-IDF als Docker-Image benutzen (Version ggf. anpassen)
+    container:
+      image: espressif/idf:v5.2.3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build demo-esp32 for ESP32-S3
+        working-directory: demo-esp32
+        run: |
+          idf.py set-target esp32s3
+          idf.py build
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: |
+            demo-esp32/build/*.bin
+            demo-esp32/build/*.elf
+            demo-esp32/build/*.map
